@@ -74,7 +74,8 @@
 
   <script type="module">
     import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';
-    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
+    //import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
+    import { BrowserMultiFormatReader, DecodeHintType } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
 
     const video = document.getElementById('video');
     const excelFile = document.getElementById('excelFile');
