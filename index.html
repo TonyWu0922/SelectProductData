@@ -90,11 +90,6 @@
     let barcodeMap = {};
     let isScanning = true;  // 標記是否在掃描中
 
-    // 手動定義 DecodeHintType（zxing 沒有直接匯出）
-    const DecodeHintType = {
-      POSSIBLE_FORMATS: 2
-    };
-
     // 讀取 Excel 檔
     excelFile.addEventListener('change', async (event) => {
       const file = event.target.files[0];
