@@ -148,8 +148,8 @@
             alert("非一維條碼，跳過此條碼。");
           }
         } else if (err && !(err instanceof NotFoundException)) {
-          console.error("掃描錯誤:", err);
-          alert("掃描錯誤，請確保條碼清晰可見，並重試。");
+          //console.error("掃描錯誤:", err);
+          //alert("掃描錯誤，請確保條碼清晰可見，並重試。");
         }
       }, hints);
     }
