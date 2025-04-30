@@ -89,28 +89,38 @@
       }
     }
 
-    // 啟動掃描
     function startScan() {
       const codeReader = new BrowserMultiFormatReader();
 
-      // 啟動相機並進行掃描
-      codeReader.decodeFromVideoDevice(undefined, 'video', (result, err) => {
+      // 設置掃描條碼的提示，僅允許一維條碼（UPC、EAN等）
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
+      ]);
+
+      // 開始掃描視頻
+      codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
         if (result) {
           const barcode = result.getText();
           const format = result.getBarcodeFormat();
-          console.log("掃描到條碼：", barcode, "格式：", format); // 使用 console.log 來檢查結果
+
+          // 顯示 alert 提示掃描到的條碼
+          alert("掃描到條碼：" + barcode + "，格式：" + format);
 
           // 僅處理一維條碼格式
           if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
-            updateScanResult(barcode);
+            updateScanResult(barcode);  // 更新掃描結果顯示
           } else {
-            console.log("非一維條碼，跳過此條碼。");
+            alert("非一維條碼，跳過此條碼。");
           }
         } else if (err) {
-          console.log("掃描錯誤：", err); // 檢查是否有錯誤
+          // 顯示錯誤訊息來調試
+          console.error("掃描錯誤:", err);
+          alert("掃描錯誤，請確保條碼清晰可見，並重試。");
         }
-      });
+      }, hints);
     }
+
   </script>
 </body>
 
