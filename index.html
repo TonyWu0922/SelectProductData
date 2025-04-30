@@ -140,48 +140,45 @@
 
       const codeReader = new BrowserMultiFormatReader();
 
-      // 查找可用的視頻設備
-      navigator.mediaDevices.enumerateDevices().then(devices => {
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        if (videoDevices.length === 0) {
-          alert("❌ 找不到攝像頭設備");
-          return;
-        }
+      // 顯式使用 getUserMedia 來啟動攝像頭
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then((stream) => {
+          video.srcObject = stream;  // 將攝像頭流設置為視頻元素的源
 
-        const videoDeviceId = videoDevices[0].deviceId;  // 使用第一個可用的攝像頭設備
+          const hints = new Map();
+          hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+            'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
+          ]);
 
-        const hints = new Map();
-        hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-          'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
-        ]);
+          // 開始掃描視頻流
+          codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+            if (result) {
+              const barcode = result.getText();
+              const format = result.getBarcodeFormat();
 
-        codeReader.decodeFromVideoDevice(videoDeviceId, video, (result, err) => {
-          if (result) {
-            const barcode = result.getText();
-            const format = result.getBarcodeFormat();
+              // 只處理特定的一維條碼格式
+              if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
+                updateScanResult(barcode);
+                console.log("掃描到條碼：" + barcode);
 
-            // 只處理特定的一維條碼格式
-            if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
-              updateScanResult(barcode);
-              console.log("掃描到條碼：" + barcode);
-
-              // 停止掃描並顯示「再次掃描」按鈕
-              isScanning = false;
-              scanButton.style.display = 'inline-block';  // 顯示「再次掃描」按鈕
-            } else {
-              console.log("非一維條碼，跳過此條碼。");
+                // 停止掃描並顯示「再次掃描」按鈕
+                isScanning = false;
+                scanButton.style.display = 'inline-block';  // 顯示「再次掃描」按鈕
+              } else {
+                console.log("非一維條碼，跳過此條碼。");
+              }
+            } else if (err) {
+              // 如果出現錯誤，但並非因為條碼不存在，可以繼續掃描
+              if (!(err instanceof NotFoundException)) {
+                console.log("掃描錯誤:", err);
+              }
             }
-          } else if (err) {
-            // 如果出現錯誤，但並非因為條碼不存在，可以繼續掃描
-            if (!(err instanceof NotFoundException)) {
-              console.log("掃描錯誤:", err);
-            }
-          }
-        }, hints);
-      }).catch(error => {
-        console.error("獲取攝像頭設備列表失敗:", error);
-        alert("❌ 無法訪問攝像頭設備");
-      });
+          }, hints);
+        })
+        .catch((error) => {
+          console.error("無法啟動攝像頭:", error);
+          alert("❌ 無法訪問攝像頭設備，請檢查權限設置。");
+        });
     }
 
     // 點擊「再次掃描」按鈕後，恢復掃描狀態
