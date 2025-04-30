@@ -91,16 +91,17 @@
     }
 
     // 啟動掃描
-    async function startScan() {
+    function startScan() {
       const codeReader = new BrowserMultiFormatReader();
-      try {
-        const result = await codeReader.decodeOnceFromVideoDevice(undefined, 'video');
-        const barcode = result.getText();
-        updateScanResult(barcode);
-      } catch (err) {
-        console.error("相機錯誤：", err);
-        alert("❌ 無法啟用相機，請確認權限設定或使用 Safari 開啟。\n" + err.message);
-      }
+
+      codeReader.decodeFromVideoDevice(undefined, 'video', (result, err) => {
+        if (result) {
+          const barcode = result.getText();
+          console.log("掃描到條碼：", barcode);
+          updateScanResult(barcode);
+        }
+        // err 不用 alert，避免掃不到時跳太多提示
+      });
     }
   </script>
 </body>
