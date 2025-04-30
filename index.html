@@ -41,7 +41,7 @@
 
   <script type="module">
     import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';
-    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
+    import { BrowserMultiFormatReader, DecodeHintType } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
 
     const video = document.getElementById('video');
     const excelFile = document.getElementById('excelFile');
@@ -93,15 +93,29 @@
     // 啟動掃描
     function startScan() {
       const codeReader = new BrowserMultiFormatReader();
-
+      
+      // 設置掃描條碼的提示，僅允許一維條碼（UPC、EAN等）
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        // 添加你想支持的一維條碼類型
+        'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
+      ]);
+      
       codeReader.decodeFromVideoDevice(undefined, 'video', (result, err) => {
         if (result) {
           const barcode = result.getText();
-          console.log("掃描到條碼：", barcode);
-          updateScanResult(barcode);
+          const format = result.getBarcodeFormat();
+          alert("掃描到條碼：", barcode, "格式：", format);
+
+          // 僅處理一維條碼格式
+          if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
+            updateScanResult(barcode);
+          } else {
+            alert("非一維條碼，跳過此條碼。");
+          }
         }
         // err 不用 alert，避免掃不到時跳太多提示
-      });
+      }, hints);
     }
   </script>
 </body>
