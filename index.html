@@ -74,13 +74,18 @@
 
   <script type="module">
     import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';
-    //import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
-    import { BrowserMultiFormatReader, DecodeHintType } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
+    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
+    //import { BrowserMultiFormatReader, DecodeHintType } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
 
     const video = document.getElementById('video');
     const excelFile = document.getElementById('excelFile');
     const itemCodeElement = document.getElementById('itemCode');
     const itemNameElement = document.getElementById('itemName');
+
+    const DecodeHintType = {
+      POSSIBLE_FORMATS: 2
+    };
+
     let barcodeMap = {};
 
     // 讀取並解析 Excel 檔案
@@ -132,6 +137,7 @@
       hints.set(DecodeHintType.POSSIBLE_FORMATS, [
         'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
       ]);
+
 
       // 開始掃描視頻
       codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
