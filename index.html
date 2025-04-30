@@ -72,7 +72,7 @@
         });
 
         alert('✅ 商品資料已載入，請開始掃描！');
-        startScan();
+        startScan();  // 開始掃描
       } catch (err) {
         alert("❌ 讀取 Excel 檔失敗：" + err.message);
       }
@@ -101,20 +101,24 @@
         'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
       ]);
       
-      codeReader.decodeFromVideoDevice(undefined, 'video', (result, err) => {
+      // 開始掃描視頻
+      codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
         if (result) {
           const barcode = result.getText();
           const format = result.getBarcodeFormat();
-          alert("掃描到條碼：", barcode, "格式：", format);
+          
+          // 顯示 alert 提示掃描到的條碼
+          alert("掃描到條碼：" + barcode + "，格式：" + format);
 
           // 僅處理一維條碼格式
           if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
-            updateScanResult(barcode);
+            updateScanResult(barcode);  // 更新掃描結果顯示
           } else {
             alert("非一維條碼，跳過此條碼。");
           }
         }
-        // err 不用 alert，避免掃不到時跳太多提示
+
+        // 如果沒有掃描到條碼，錯誤不顯示 alert，避免頻繁彈出
       }, hints);
     }
   </script>
