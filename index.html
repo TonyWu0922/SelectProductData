@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>查詢產品名稱</title>
-  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -72,7 +71,7 @@
         });
 
         alert('✅ 商品資料已載入，請開始掃描！');
-        startScan();  // 開始掃描
+        startScan();
       } catch (err) {
         alert("❌ 讀取 Excel 檔失敗：" + err.message);
       }
@@ -97,28 +96,24 @@
       // 設置掃描條碼的提示，僅允許一維條碼（UPC、EAN等）
       const hints = new Map();
       hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-        // 添加你想支持的一維條碼類型
         'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
       ]);
       
-      // 開始掃描視頻
-      codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+      codeReader.decodeFromVideoDevice(undefined, 'video', (result, err) => {
         if (result) {
           const barcode = result.getText();
           const format = result.getBarcodeFormat();
-          
-          // 顯示 alert 提示掃描到的條碼
-          alert("掃描到條碼：" + barcode + "，格式：" + format);
+          console.log("掃描到條碼：", barcode, "格式：", format); // 使用 console.log 來檢查結果
 
           // 僅處理一維條碼格式
           if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
-            updateScanResult(barcode);  // 更新掃描結果顯示
+            updateScanResult(barcode);
           } else {
-            alert("非一維條碼，跳過此條碼。");
+            console.log("非一維條碼，跳過此條碼。");
           }
+        } else if (err) {
+          console.log("掃描錯誤：", err); // 檢查是否有錯誤
         }
-
-        // 如果沒有掃描到條碼，錯誤不顯示 alert，避免頻繁彈出
       }, hints);
     }
   </script>
