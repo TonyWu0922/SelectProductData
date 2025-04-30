@@ -93,7 +93,7 @@
     function startScan() {
       const codeReader = new BrowserMultiFormatReader();
 
-      // 設定條碼掃描器，讓它自動處理不同類型的條碼
+      // 啟動相機並進行掃描
       codeReader.decodeFromVideoDevice(undefined, 'video', (result, err) => {
         if (result) {
           const barcode = result.getText();
