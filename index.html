@@ -140,16 +140,20 @@
           const barcode = result.getText();
           const format = result.getBarcodeFormat();
 
-          alert("掃描到條碼：" + barcode + "，格式：" + format);
+          // 這裡可以選擇直接將條碼結果顯示在畫面上
+          updateScanResult(barcode);
 
+          // 只處理特定的一維條碼格式
           if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
-            updateScanResult(barcode);
+            console.log("掃描到條碼：" + barcode); // 記錄掃描條碼
           } else {
-            alert("非一維條碼，跳過此條碼。");
+            console.log("非一維條碼，跳過此條碼。");
           }
-        } else if (err && !(err instanceof NotFoundException)) {
-          //console.error("掃描錯誤:", err);
-          //alert("掃描錯誤，請確保條碼清晰可見，並重試。");
+        } else if (err) {
+          // 如果出現錯誤，但並非因為條碼不存在，可以繼續掃描
+          if (!(err instanceof NotFoundException)) {
+            console.log("掃描錯誤:", err);
+          }
         }
       }, hints);
     }
