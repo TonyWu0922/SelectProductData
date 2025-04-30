@@ -75,20 +75,19 @@
   <script type="module">
     import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';
     import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
-    //import { BrowserMultiFormatReader, DecodeHintType } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
 
     const video = document.getElementById('video');
     const excelFile = document.getElementById('excelFile');
     const itemCodeElement = document.getElementById('itemCode');
     const itemNameElement = document.getElementById('itemName');
+    let barcodeMap = {};
 
+    // 手動定義 DecodeHintType（zxing 沒有直接匯出）
     const DecodeHintType = {
       POSSIBLE_FORMATS: 2
     };
 
-    let barcodeMap = {};
-
-    // 讀取並解析 Excel 檔案
+    // 讀取 Excel 檔
     excelFile.addEventListener('change', async (event) => {
       const file = event.target.files[0];
       if (!file) return;
@@ -117,7 +116,6 @@
       }
     });
 
-    // 顯示掃描結果
     function updateScanResult(barcode) {
       const matched = barcodeMap[barcode];
       if (matched) {
@@ -132,37 +130,29 @@
     function startScan() {
       const codeReader = new BrowserMultiFormatReader();
 
-      // 設置掃描條碼的提示，僅允許一維條碼（UPC、EAN等）
       const hints = new Map();
       hints.set(DecodeHintType.POSSIBLE_FORMATS, [
         'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
       ]);
 
-
-      // 開始掃描視頻
       codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
         if (result) {
-          alert("掃描到：" + result.getText());
           const barcode = result.getText();
           const format = result.getBarcodeFormat();
 
-          // 顯示 alert 提示掃描到的條碼
           alert("掃描到條碼：" + barcode + "，格式：" + format);
 
-          // 僅處理一維條碼格式
           if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
-            updateScanResult(barcode);  // 更新掃描結果顯示
+            updateScanResult(barcode);
           } else {
             alert("非一維條碼，跳過此條碼。");
           }
-        } else if (err) {
-          // 顯示錯誤訊息來調試
+        } else if (err && !(err instanceof NotFoundException)) {
           console.error("掃描錯誤:", err);
           alert("掃描錯誤，請確保條碼清晰可見，並重試。");
         }
       }, hints);
     }
-
   </script>
 </body>
 
