@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,22 +11,26 @@
       text-align: center;
       padding: 1rem;
     }
+
     video {
       width: 100%;
       max-width: 480px;
       margin: 1rem auto;
       border: 1px solid #ccc;
     }
+
     .result {
       margin-top: 1rem;
       font-size: 1.2rem;
     }
+
     .scanner-container {
       position: relative;
       display: inline-block;
       width: 100%;
       max-width: 480px;
     }
+
     .scan-line {
       position: absolute;
       top: 50%;
@@ -35,11 +40,21 @@
       background: red;
       animation: scanAnim 2s infinite;
     }
+
     @keyframes scanAnim {
-      0% { top: 0%; }
-      50% { top: 50%; }
-      100% { top: 0%; }
+      0% {
+        top: 0%;
+      }
+
+      50% {
+        top: 50%;
+      }
+
+      100% {
+        top: 0%;
+      }
     }
+
     #scanButton {
       margin-top: 20px;
     }
@@ -58,10 +73,11 @@
     <p><strong>品號:</strong> <span id="itemCode">未掃描</span></p>
     <p><strong>品名:</strong> <span id="itemName">未掃描</span></p>
   </div>
+  <button id="startScanBtn">開始掃描</button>
   <button id="scanButton" style="display:none;">再次掃描</button>
 
   <script type="module">
-    import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';    
+    import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';
     import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.1/+esm';
 
     const video = document.getElementById('video');
@@ -72,20 +88,20 @@
     let barcodeMap = {};
     let codeReader = null;
     let currentStream = null;
-  
+
     const DecodeHintType = { POSSIBLE_FORMATS: 2 };
-  
+
     // 讀取 Excel 檔
     excelFile.addEventListener('change', async (event) => {
       const file = event.target.files[0];
       if (!file) return;
-  
+
       try {
         const arrayBuffer = await file.arrayBuffer();
         const workbook = read(arrayBuffer, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const data = utils.sheet_to_json(sheet);
-  
+
         barcodeMap = {};
         data.forEach(row => {
           const barcode = row['條碼編號'];
@@ -96,14 +112,14 @@
             };
           }
         });
-  
+
         alert('✅ 商品資料已載入，請開始掃描！');
-        startScan();
+        //startScan();
       } catch (err) {
         alert("❌ 讀取 Excel 檔失敗：" + err.message);
       }
     });
-  
+
     function updateScanResult(barcode) {
       const matched = barcodeMap[barcode];
       if (matched) {
@@ -114,33 +130,37 @@
         itemNameElement.textContent = "未找到資料";
       }
     }
-  
+
+    document.getElementById('startScanBtn').addEventListener('click', () => {
+      startScan(); // 攝影機啟動必須由用戶觸發
+    });
+
     async function startScan() {
       // 如果已存在掃描器，先重設
       if (codeReader) {
         codeReader.reset();
       }
       codeReader = new BrowserMultiFormatReader();
-  
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
         currentStream = stream;
         video.srcObject = stream;
-  
+
         const hints = new Map();
         //hints.set(DecodeHintType.POSSIBLE_FORMATS, [
         //  'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
         //]);
-  
+
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
-          if (result) {            
+          if (result) {
             const barcode = result.getText();
             const format = result.getBarcodeFormat();
             alert(result);
             if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
               updateScanResult(barcode);
               console.log("✅ 掃描到條碼：" + barcode);
-  
+
               // 停止掃描與攝像頭
               stopScan();
               scanButton.style.display = 'inline-block';
@@ -155,7 +175,7 @@
         alert("❌ 無法訪問攝像頭設備，請檢查權限設置。");
       }
     }
-  
+
     function stopScan() {
       if (codeReader) {
         codeReader.reset();
@@ -165,7 +185,7 @@
         currentStream = null;
       }
     }
-  
+
     scanButton.addEventListener('click', () => {
       itemCodeElement.textContent = "未掃描";
       itemNameElement.textContent = "未掃描";
@@ -173,6 +193,7 @@
       startScan();
     });
   </script>
-  
+
 </body>
+
 </html>
