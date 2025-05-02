@@ -131,7 +131,7 @@
       scanBtn.disabled = true;
       scanBtn.textContent = "掃描中...";
 
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
           currentStream = stream;
           video.srcObject = stream;
