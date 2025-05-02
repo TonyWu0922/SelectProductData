@@ -77,12 +77,9 @@
   <button id="scanButton" style="display:none;">再次掃描</button> -->
   <button id="scanBtn">開始掃描</button>
 
-  <!-- <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.1/umd/index.min.js"></script> -->
   <script type="module">
-     import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';
-     import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.1/+esm';
-    const codeReader = new ZXing.BrowserMultiFormatReader();
+    import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';
+    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.1/+esm';
 
     const video = document.getElementById('video');
     const excelFile = document.getElementById('excelFile');
@@ -91,7 +88,8 @@
     // const scanButton = document.getElementById('scanButton');
     const scanBtn = document.getElementById('scanBtn');
 
-    let barcodeMap = {};    
+    let barcodeMap = {};
+    let codeReader = null;
     let currentStream = null;
     let isClick = false
 
@@ -182,7 +180,7 @@
       }
       codeReader = new BrowserMultiFormatReader();
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true});
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
         currentStream = stream;
         video.srcObject = stream;
 
