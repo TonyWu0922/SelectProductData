@@ -62,7 +62,7 @@
 
   <script type="module">
     import { read, utils } from 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm';
-    import { BrowserMultiFormatReader, NotFoundException } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
+    import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
   
     const video = document.getElementById('video');
     const excelFile = document.getElementById('excelFile');
@@ -145,7 +145,7 @@
               stopScan();
               scanButton.style.display = 'inline-block';
             }
-          } else if (err && !(err instanceof NotFoundException)) {
+          } else if (err && err.name !== 'NotFoundException') {
             console.error("掃描錯誤:", err);
           }
         }, hints);
