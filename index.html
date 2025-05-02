@@ -132,6 +132,7 @@
           'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
         ]);
   
+        alert(result);
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
           if (result) {
             const barcode = result.getText();
