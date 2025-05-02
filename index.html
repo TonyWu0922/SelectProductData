@@ -88,6 +88,7 @@
     let barcodeMap = {};
     let codeReader = null;
     let currentStream = null;
+    let isClick = false
 
     const DecodeHintType = { POSSIBLE_FORMATS: 2 };
 
@@ -131,9 +132,9 @@
       }
     }
 
-    document.getElementById('startScanBtn').addEventListener('click', () => {
-      startScan(); // 攝影機啟動必須由用戶觸發
-    });
+    //document.getElementById('startScanBtn').addEventListener('click', () => {
+    //  startScan(); // 攝影機啟動必須由用戶觸發
+    //});
 
     async function startScan() {
       // 如果已存在掃描器，先重設
@@ -154,9 +155,9 @@
 
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
           if (result) {
+            isClick = false;
             const barcode = result.getText();
             const format = result.getBarcodeFormat();
-            alert(result);
             if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
               updateScanResult(barcode);
               console.log("✅ 掃描到條碼：" + barcode);
@@ -167,6 +168,7 @@
             }
           } else if (err && err.name !== 'NotFoundException') {
             //alert(err);
+            isClick = false;
             console.error("掃描錯誤:", err);
           }
         }, hints);
@@ -186,7 +188,14 @@
       }
     }
 
+
     scanButton.addEventListener('click', () => {
+      if (isClick == false) {
+        isClick = true;
+        startScan();
+      } else {
+
+      }
       itemCodeElement.textContent = "未掃描";
       itemNameElement.textContent = "未掃描";
       scanButton.style.display = 'none';
