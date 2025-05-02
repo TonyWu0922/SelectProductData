@@ -128,9 +128,9 @@
         video.srcObject = stream;
   
         const hints = new Map();
-        hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-          'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
-        ]);
+        //hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        //  'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
+        //]);
   
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
           if (result) {
@@ -147,7 +147,7 @@
               scanButton.style.display = 'inline-block';
             }
           } else if (err && err.name !== 'NotFoundException') {
-            alert(err);
+            //alert(err);
             console.error("掃描錯誤:", err);
           }
         }, hints);
