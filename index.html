@@ -192,6 +192,9 @@
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
           if (result) {
             isClick = false;
+            alert(result.getText());
+            alert(result.getBarcodeFormat());
+
             const barcode = result.getText();
             const format = result.getBarcodeFormat();
             if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
