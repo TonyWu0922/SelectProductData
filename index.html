@@ -178,16 +178,20 @@
       if (codeReader) {
         codeReader.reset();
       }
+
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.EAN_13]);
       codeReader = new BrowserMultiFormatReader();
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
         currentStream = stream;
         video.srcObject = stream;
 
-        const hints = new Map();
-        hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-          'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
-        ]);
+        // const hints = new Map();
+        // hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        //   'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
+        // ]);
 
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
           if (result) {
@@ -197,14 +201,20 @@
 
             const barcode = result.getText();
             const format = result.getBarcodeFormat();
-            if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
-              updateScanResult(barcode);
-              console.log("✅ 掃描到條碼：" + barcode);
+            alert(barcode);
+            updateScanResult(barcode);
+            // 停止掃描與攝像頭
+            stopScan();
+            scanButton.style.display = 'inline-block';
+            
+            // if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
+            //   updateScanResult(barcode);
+            //   console.log("✅ 掃描到條碼：" + barcode);
 
-              // 停止掃描與攝像頭
-              stopScan();
-              scanButton.style.display = 'inline-block';
-            }
+            //   // 停止掃描與攝像頭
+            //   stopScan();
+            //   scanButton.style.display = 'inline-block';
+            // }
           } else if (err && err.name !== 'NotFoundException') {
             //alert(err);
             isClick = false;
