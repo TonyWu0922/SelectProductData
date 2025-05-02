@@ -133,11 +133,10 @@
         //]);
   
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
-          if (result) {
-            alert(result);
+          if (result) {            
             const barcode = result.getText();
             const format = result.getBarcodeFormat();
-  
+            alert(result);
             if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
               updateScanResult(barcode);
               console.log("✅ 掃描到條碼：" + barcode);
