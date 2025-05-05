@@ -66,7 +66,7 @@
   <input type="file" id="excelFile" accept=".xlsx" />
   <div class="scanner-container">
     <video id="video" autoplay muted playsinline></video>
-    <div class="scan-line"></div>
+    <!-- <div class="scan-line"></div> -->
   </div>
   <div class="result">
     <h3>掃描結果</h3>
@@ -132,12 +132,19 @@
       scanBtn.disabled = true;
       scanBtn.textContent = "掃描中...";
 
-      // 確保 getUserMedia 在點擊事件裡直接啟動
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
+      ]);
+
+      const options = { hints };
+
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
         .then((stream) => {
           currentStream = stream;
           video.srcObject = stream;
           codeReader = new BrowserMultiFormatReader();
+
           codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
             if (result) {
               const barcode = result.getText();
@@ -149,7 +156,7 @@
               console.error("掃描錯誤:", err);
               scanBtn.disabled = false;
             }
-          });
+          }, options);
         })
         .catch((error) => {
           console.error("❌ 無法啟動相機", error);
@@ -157,8 +164,7 @@
           scanBtn.disabled = false;
         });
     });
-
-
+    
     function updateScanResult(barcode) {
       const matched = barcodeMap[barcode];
       if (matched) {
@@ -178,43 +184,32 @@
       if (codeReader) {
         codeReader.reset();
       }
-
-      const hints = new Map();
-      hints.set(DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.EAN_13]);
       codeReader = new BrowserMultiFormatReader();
-
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
         currentStream = stream;
         video.srcObject = stream;
 
-        // const hints = new Map();
-        // hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-        //   'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
-        // ]);
+        const hints = new Map();
+        //hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        //  'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
+        //]);
 
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
           if (result) {
             isClick = false;
             alert(result.getText());
-            alert(result.getBarcodeFormat());
-
+            alert(result.getText());
             const barcode = result.getText();
             const format = result.getBarcodeFormat();
-            alert(barcode);
-            updateScanResult(barcode);
-            // 停止掃描與攝像頭
-            stopScan();
-            scanButton.style.display = 'inline-block';
-            
-            // if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
-            //   updateScanResult(barcode);
-            //   console.log("✅ 掃描到條碼：" + barcode);
+            if (['EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'].includes(format.toString())) {
+              updateScanResult(barcode);
+              console.log("✅ 掃描到條碼：" + barcode);
 
-            //   // 停止掃描與攝像頭
-            //   stopScan();
-            //   scanButton.style.display = 'inline-block';
-            // }
+              // 停止掃描與攝像頭
+              stopScan();
+              scanButton.style.display = 'inline-block';
+            }
           } else if (err && err.name !== 'NotFoundException') {
             //alert(err);
             isClick = false;
@@ -236,8 +231,6 @@
         currentStream = null;
       }
     }
-
-
 
   </script>
 
