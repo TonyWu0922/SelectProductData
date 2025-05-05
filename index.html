@@ -124,6 +124,8 @@
       }
     });
 
+
+
     //按鈕
     scanBtn.addEventListener('click', () => {
       itemCodeElement.textContent = "未掃描";
@@ -132,19 +134,18 @@
       scanBtn.disabled = true;
       scanBtn.textContent = "掃描中...";
 
-      const hints = new Map();
-      hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-        'EAN_13', 'UPC_A', 'UPC_E', 'EAN_8', 'CODE_128', 'CODE_39', 'ITF', 'CODE_93'
-      ]);
-
-      const options = { hints };
-
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      // 確保 getUserMedia 在點擊事件裡直接啟動
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      })
         .then((stream) => {
           currentStream = stream;
           video.srcObject = stream;
           codeReader = new BrowserMultiFormatReader();
-
           codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
             if (result) {
               const barcode = result.getText();
@@ -156,7 +157,7 @@
               console.error("掃描錯誤:", err);
               scanBtn.disabled = false;
             }
-          }, options);
+          });
         })
         .catch((error) => {
           console.error("❌ 無法啟動相機", error);
@@ -164,7 +165,8 @@
           scanBtn.disabled = false;
         });
     });
-    
+
+
     function updateScanResult(barcode) {
       const matched = barcodeMap[barcode];
       if (matched) {
